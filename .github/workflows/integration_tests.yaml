@@ -27,6 +27,17 @@ jobs:
           pip install -e projects/fal
           pip install pytest pytest-asyncio pillow
 
+      - name: Check secrets
+        env:
+            FAL_CLOUD_KEY_ID: ${{ secrets.FAL_CLOUD_KEY_ID }}
+            FAL_CLOUD_KEY_SECRET: ${{ secrets.FAL_CLOUD_KEY_SECRET }}
+            FAL_CLOUD_INTEGRATION_TEST_HOST: ${{ vars.FAL_CLOUD_INTEGRATION_TEST_HOST }}
+        if: ${{ env.FAL_CLOUD_KEY_ID == '' || env.FAL_CLOUD_KEY_SECRET == '' || FAL_CLOUD_INTEGRATION_TEST_HOST == ''}}
+        uses: actions/github-script@v3
+        with:
+            script: |
+                core.setFailed('Missing secrets')
+
       - name: Run integration tests
         env:
           FAL_KEY: ${{ secrets.FAL_CLOUD_KEY_ID }}:${{ secrets.FAL_CLOUD_KEY_SECRET }}
